@@ -4,27 +4,28 @@
 #include "DTFecha.h"
 #include "DTLector.h"
 #include "Lector.h"
+#include "DTFuncionario.h"
+#include "Funcionario.h"
 #include <iostream>
 
 using namespace std;
 
-// Iniciar Sesión (1er caso de uso)
 bool ControladorRegistro::ingresarDatos(int id, string pass) {
     Sesion* sesion = Sesion::getInstancia();
 
-    if (sesion->getUsuarioLogueado() != nullptr) { // si hay una sesión activa
+    if (sesion->getUsuarioLogueado() != nullptr) {
         return false;
     }
 
     ManejadorUsuarios* mjus = ManejadorUsuarios::getInstancia();
 
-    if (!mjus->existeUsuario(id)) { // si el usuario no existe
+    if (!mjus->existeUsuario(id)) {
         return false;
     }
 
     Usuario* usuario = mjus->buscarUsuario(id);
 
-    if (usuario->getPass() != pass) { // si la contraseña no coincide
+    if (usuario->getPass() != pass) {
         return false;
     }
 
@@ -33,12 +34,10 @@ bool ControladorRegistro::ingresarDatos(int id, string pass) {
     return true;
 }
 
-// Cancelar Inicio de Sesión (2do caso de uso) 2.1
 void ControladorRegistro::cancelarInicioSesion() {
     usuarioPendiente = nullptr;
 }
 
-// 2.2
 void ControladorRegistro::confirmarInicioSesion() {
     if (usuarioPendiente != nullptr) {
         Sesion::getInstancia()->login(usuarioPendiente);
@@ -46,18 +45,43 @@ void ControladorRegistro::confirmarInicioSesion() {
     }
 }
 
-// Cerrar Sesión (3er caso de uso)
 void ControladorRegistro::cerrarSesion() {
     Sesion::getInstancia()->logout();
 }
 
-// Registrar Lector (4to caso de uso) 4.1
 DTLector* ControladorRegistro::ingresarLector(int id, string nombre, string pass, DTFecha fechaR) {
+    ManejadorUsuarios* mu = ManejadorUsuarios::getInstancia();
+    
+    if (mu->existeUsuario(id))
+        return nullptr;
+
     this->dtLector = new DTLector(id, nombre, pass, fechaR);
     return this->dtLector;
 }
 
-// 4.2
+DTFuncionario* ControladorRegistro::ingresarFuncionario(int id, string nombre, string pass, int numEmpleado) {
+    ManejadorUsuarios* mu = ManejadorUsuarios::getInstancia();
+
+    if (mu->existeUsuario(id))
+        return nullptr;
+
+    this->dtFuncionario = new DTFuncionario(id, nombre, pass, numEmpleado);
+    return this->dtFuncionario;
+}
+
+void ControladorRegistro::registrarFuncionario() {
+    ManejadorUsuarios* mjus = ManejadorUsuarios::getInstancia();
+
+    Usuario* usuario = new Funcionario(
+        this->dtFuncionario->getId(),
+        this->dtFuncionario->getNombre(),
+        this->dtFuncionario->getPass(),
+        this->dtFuncionario->getNumEmpleado()
+    );
+
+    mjus->agregarUsuario(usuario);
+}
+
 void ControladorRegistro::registrarLector() {
     ManejadorUsuarios* mjus = ManejadorUsuarios::getInstancia();
 
@@ -75,14 +99,13 @@ void ControladorRegistro::registrarLector() {
     mjus->agregarUsuario(usuario);
 }
 
-// Cancelar Registro (5to caso de uso)
 void ControladorRegistro::cancelarRegistro() {
-    delete this->dtLector;
-    this->dtLector = nullptr;
-}
-
-// funcion auxiliar para validar que no se registre un nuevo usuario con un ID ya existente
-bool ControladorRegistro::existeUsuario(int id) {
-    ManejadorUsuarios* mjus = ManejadorUsuarios::getInstancia();
-    return mjus->existeUsuario(id);
+    if (this->dtLector != nullptr) {
+        delete this->dtLector;
+        this->dtLector = nullptr;
+    }
+    if (this->dtFuncionario != nullptr) {
+        delete this->dtFuncionario;
+        this->dtFuncionario = nullptr;
+    }
 }

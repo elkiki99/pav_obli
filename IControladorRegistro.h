@@ -7,6 +7,7 @@ using namespace std;
 
 class DTLector;
 class DTFecha;
+class DTFuncionario;
 
 class IControladorRegistro {
     public:
@@ -19,10 +20,10 @@ class IControladorRegistro {
 
         virtual DTLector* ingresarLector(int id, string nombre, string pass, DTFecha fechaR) = 0;
         virtual void registrarLector() = 0;
+        virtual DTFuncionario* ingresarFuncionario(int id, string nombre, string pass, int numEmpleado) = 0;
+        virtual void registrarFuncionario() = 0;
 
         virtual void cancelarRegistro() = 0;
-
-        virtual bool existeUsuario(int id) = 0; // para validar que no se registre un nuevo usuario con un ID ya existente
 };
 
 #endif

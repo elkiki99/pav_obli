@@ -3,23 +3,43 @@
 #include "IControladorRegistro.h"
 #include "DTFecha.h"
 #include "DTLector.h"
+#include "DTFuncionario.h"
 #include "Sesion.h"
 
 using namespace std;
 
 void iniciarSesion();
+void registrarFuncionario();
 void registrarLector();
 void cerrarSesion();
+void cancelarRegistro();
+// void registrarMaterial();
+// void verInformacionMaterial();
 
 int main() {
     int opcion = -1;
 
     do {
+        Usuario* usuarioLogueado = Sesion::getInstancia()->getUsuarioLogueado();
+
         cout << "\n=== Sistema de Registro ===\n" << endl;
-        cout << "1. Iniciar Sesión" << endl;
-        cout << "2. Registrar Lector" << endl;
-        cout << "3. Cerrar Sesión" << endl;
-        cout << "4. Salir" << endl;
+
+        if (usuarioLogueado == nullptr) {
+            cout << "1. Iniciar Sesión" << endl;
+        }
+        cout << "2. Registrar Funcionario" << endl;
+        cout << "3. Registrar Lector" << endl;
+
+        if (usuarioLogueado != nullptr) {
+            cout << "4. Cerrar Sesión" << endl;
+        }
+        
+        if (usuarioLogueado != nullptr && usuarioLogueado->getTipo() == "Funcionario") {
+            cout << "5. Registrar Material" << endl;
+            cout << "6. Ver Información Material" << endl;
+        }
+
+        cout << "9. Salir" << endl;
         cout << "Opción: ";
         
         cin >> opcion;
@@ -30,19 +50,45 @@ int main() {
                 break;
             }   
             case 2: {
-                registrarLector();
+                registrarFuncionario();
                 break;
             }
             case 3: {
-                cerrarSesion();
+                registrarLector();
                 break;
             }
             case 4: {
+                cerrarSesion();
+                break;
+            }
+            case 5: {
+                if (usuarioLogueado != nullptr && usuarioLogueado->getTipo() == "Funcionario") {
+                    // registrarMaterial();
+                    cout << "\nFuncionalidad de registrar material no implementada aún." << endl;
+                } else {
+                    cout << "\nOpción inválida. Por favor, seleccione una opción válida." << endl;
+                }
+                break;
+            }
+            case 6: {
+                if (usuarioLogueado != nullptr && usuarioLogueado->getTipo() == "Funcionario") {
+                    // verInformacionMaterial();
+                    cout << "\nFuncionalidad de ver información de material no implementada aún." << endl;
+                } else {
+                    cout << "\nOpción inválida. Por favor, seleccione una opción válida." << endl;
+                }
+                break;
+            }
+            case 9: {
                 cout << "\nSaliendo del sistema..." << endl;
                 break;
             }
+            default: {
+                cout << "\nOpción inválida. Por favor, seleccione una opción válida." << endl;
+                break;
+            }
         }
-    } while(opcion != 4);
+    } while(opcion != 9);
 
 }
 
@@ -83,7 +129,8 @@ void iniciarSesion() {
         
         if (opcionConfirmar == 1) {
             ctrlReg->confirmarInicioSesion();
-            cout << "\nInicio de sesión exitoso" << endl;
+            // cout << "\nInicio de sesión exitoso" << endl;
+            cout << "\nBienvenid@, " << Sesion::getInstancia()->getUsuarioLogueado()->getNombre() << "!" << endl;
         } else if(opcionConfirmar == 2) {
             ctrlReg->cancelarInicioSesion();
             cout << "\nInicio de sesión cancelado" << endl;
@@ -91,6 +138,57 @@ void iniciarSesion() {
     } else {
         cout << "\nError al iniciar sesión: Datos incorrectos" << endl;
         ctrlReg->cancelarInicioSesion();
+    }
+}
+
+void registrarFuncionario() {
+    int id, numEmpleado;
+    string nombre, pass;
+
+    cout << "\nIngrese ID (cédula): ";
+    cin >> id;
+    cout << "\nIngrese Nombre: ";
+    cin >> nombre;
+    cout << "\nIngrese Contraseña: ";
+    cin >> pass;
+    cout << "\nIngrese Número de Empleado: ";
+    cin >> numEmpleado;
+
+    IControladorRegistro* ctrlReg = FabricaRegistro::getInstancia()->getIControladorRegistro();
+    DTFuncionario* dtFuncionario = ctrlReg->ingresarFuncionario(id, nombre, pass, numEmpleado);
+
+    if (dtFuncionario == nullptr) {
+        cout << "\nError: Ya existe un usuario registrado con ese ID." << endl;
+        return;
+    }
+
+    // Mostrar datos del funcionario antes de registrar
+    cout << "\n=== Confirmar Registro de Funcionario ===\n" << endl;
+    cout << "ID (cédula): " << dtFuncionario->getId() << endl;
+    cout << "Nombre: " << dtFuncionario->getNombre() << endl;
+    cout << "Contraseña: " << dtFuncionario->getPass() << endl;
+    cout << "Número de Empleado: " << dtFuncionario->getNumEmpleado() << endl;
+
+    int opcionConfirmar = -1;
+
+    cout << "\n1. Confirmar Registro" << endl;
+    cout << "2. Cancelar Registro" << endl;
+    cout << "Opción: ";
+
+    cin >> opcionConfirmar;
+
+    while(opcionConfirmar != 1 && opcionConfirmar != 2) {
+        cout << "\nOpción inválida. Por favor, ingrese 1 para confirmar o 2 para cancelar." << endl;
+        cout << "Opción: ";
+        cin >> opcionConfirmar;
+    }
+    
+    if (opcionConfirmar == 1) {
+        ctrlReg->registrarFuncionario();
+        cout << "\nFuncionario registrado exitosamente" << endl;
+    } else if (opcionConfirmar == 2) {
+        ctrlReg->cancelarRegistro();
+        cout << "\nRegistro cancelado" << endl;
     }
 }
 
@@ -112,45 +210,39 @@ void registrarLector() {
     IControladorRegistro* ctrlReg = FabricaRegistro::getInstancia()->getIControladorRegistro();
     DTLector* dtLector = ctrlReg->ingresarLector(id, nombre, pass, fechaRegistro);
     
-    if (dtLector != nullptr) {
-        // Mostrar datos del lector antes de registrar
-        cout << "\n=== Confirmar Registro de Lector ===\n" << endl;
-        cout << "ID (cédula): " << dtLector->getId() << endl;
-        cout << "Nombre: " << dtLector->getNombre() << endl;
-        cout << "Contraseña: " << dtLector->getPass() << endl;
-        DTFecha fecha = dtLector->getFechaRegistro();
-        cout << "Fecha de Registro: " << fecha.getDia() << "/" << fecha.getMes() << "/" << fecha.getAnio() << endl;
+    if (dtLector == nullptr) {
+        cout << "\nError: Ya existe un usuario registrado con ese ID." << endl;
+        return;
+    }
 
-        int opcionConfirmar = -1;
+    // Mostrar datos del lector antes de registrar
+    cout << "\n=== Confirmar Registro de Lector ===\n" << endl;
+    cout << "ID (cédula): " << dtLector->getId() << endl;
+    cout << "Nombre: " << dtLector->getNombre() << endl;
+    cout << "Contraseña: " << dtLector->getPass() << endl;
+    DTFecha fecha = dtLector->getFechaRegistro();
+    cout << "Fecha de Registro: " << fecha.getDia() << "/" << fecha.getMes() << "/" << fecha.getAnio() << endl;
 
-        cout << "\n1. Confirmar Registro" << endl;
-        cout << "2. Cancelar Registro" << endl;
+    int opcionConfirmar = -1;
+
+    cout << "\n1. Confirmar Registro" << endl;
+    cout << "2. Cancelar Registro" << endl;
+    cout << "Opción: ";
+
+    cin >> opcionConfirmar;
+
+    while(opcionConfirmar != 1 && opcionConfirmar != 2) {
+        cout << "\nOpción inválida. Por favor, ingrese 1 para confirmar o 2 para cancelar." << endl;
         cout << "Opción: ";
-
         cin >> opcionConfirmar;
-
-        while(opcionConfirmar != 1 && opcionConfirmar != 2) {
-            cout << "\nOpción inválida. Por favor, ingrese 1 para confirmar o 2 para cancelar." << endl;
-            cout << "Opción: ";
-            cin >> opcionConfirmar;
-        }
-        
-        if (opcionConfirmar == 1) {
-            ctrlReg->registrarLector();
-
-            if (ctrlReg->existeUsuario(id)) {
-                cout << "\nError: Ya existe un usuario registrado con ese ID." << endl;
-                ctrlReg->cancelarRegistro();
-                return;
-            }
-            cout << "\nLector registrado exitosamente" << endl;
-        } else if (opcionConfirmar == 2) {
-            ctrlReg->cancelarRegistro();
-            cout << "\nRegistro cancelado" << endl;
-        }
-    } else {
-        cout << "\nError al registrar lector" << endl;
+    }
+    
+    if (opcionConfirmar == 1) {
+        ctrlReg->registrarLector();
+        cout << "\nLector registrado exitosamente" << endl;
+    } else if (opcionConfirmar == 2) {
         ctrlReg->cancelarRegistro();
+        cout << "\nRegistro cancelado" << endl;
     }
 }
 

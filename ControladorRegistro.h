@@ -9,7 +9,8 @@ class Sesion;
 
 class ControladorRegistro : public IControladorRegistro {
 private:
-    Usuario* usuarioPendiente;
+    Usuario* usuarioPendiente = nullptr;
+    DTLector* dtLector = nullptr;
 
 public:
     // Iniciar Sesión (1er caso de uso)
@@ -22,6 +23,14 @@ public:
     // Cerrar Sesión (3er caso de uso)
     void cerrarSesion();
 
+    // Registrar Lector (4to caso de uso)
+    DTLector* ingresarLector(int id, string nombre, string pass, DTFecha fechaR);
+    void registrarLector();
+
+    // Cancelar Registro (5to caso de uso)
+    void cancelarRegistro();
+
+    bool existeUsuario(int id);
     
 };
 

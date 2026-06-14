@@ -1,4 +1,5 @@
 #include "Libro.h"
+#include "DTLibro.h"
 
 Libro::Libro() {}
 
@@ -27,6 +28,10 @@ void Libro::setCantidadPaginas(int cantidadPaginas) {
 
 string Libro::getTipo() {
     return "Libro";
+}
+
+DTMaterial* Libro::toDT() {
+    return new DTLibro(getId(), getTitulo(), getAnioPublicacion(), autor, cantidadPaginas);
 }
 
 // Libro::~Libro() {}

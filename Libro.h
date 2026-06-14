@@ -3,6 +3,8 @@
 
 #include "Material.h"
 
+class DTMaterial;
+
 class Libro : public Material {
     private:
         string autor;
@@ -19,6 +21,7 @@ class Libro : public Material {
         void setCantidadPaginas(int cantidadPaginas);
 
         string getTipo() override;
+        DTMaterial* toDT() override;
         // ~Libro();
         
 };

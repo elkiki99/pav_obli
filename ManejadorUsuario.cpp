@@ -30,4 +30,11 @@ void ManejadorUsuarios::agregarUsuario(Usuario* usuario) {
     usuarios.insert(pair<int, Usuario*>(usuario->getId(), usuario));
 }
 
-ManejadorUsuarios::~ManejadorUsuarios() {}
+ManejadorUsuarios::~ManejadorUsuarios() {
+    map<int, Usuario*>::iterator it;
+
+    for (it = usuarios.begin(); it != usuarios.end(); ++it)
+        delete it->second;
+
+    usuarios.clear();
+}

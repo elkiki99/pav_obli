@@ -13,13 +13,15 @@ class DTFuncionario {
         int numEmpleado;
 
     public:
-        DTFuncionario(int id, string nombre, string pass, int numEmpleado)
-            : id(id), nombre(nombre), pass(pass), numEmpleado(numEmpleado) {}
+        DTFuncionario(int id, string nombre, string pass, int numEmpleado);
 
-        int getId() const { return id; }
-        string getNombre() const { return nombre; }
-        string getPass() const { return pass; }
-        int getNumEmpleado() const { return numEmpleado; }
+        int getId();
+
+        string getNombre();
+
+        string getPass();
+
+        int getNumEmpleado();
 };
 
 #endif

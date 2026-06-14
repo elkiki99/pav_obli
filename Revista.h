@@ -3,6 +3,8 @@
 
 #include "Material.h"
 
+class DTMaterial;
+
 class Revista : public Material {
     private:
         int numeroEdicion;
@@ -19,6 +21,7 @@ class Revista : public Material {
         void setPublicacionMensual(bool publicacionMensual);
 
         string getTipo() override;
+        DTMaterial* toDT() override;
         // ~Revista();
 };
 

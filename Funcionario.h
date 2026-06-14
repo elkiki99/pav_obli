@@ -14,6 +14,7 @@ class Funcionario : public Usuario {
         void setNumEmpleado(int numEmpleado);
         int getNumEmpleado();
         
+        DTLector* toDT() override { return nullptr; }
         string getTipo() override;
         // ~Funcionario();
         

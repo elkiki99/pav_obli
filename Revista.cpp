@@ -1,4 +1,5 @@
 #include "Revista.h"
+#include "DTRevista.h"
 
 Revista::Revista() {}
 
@@ -27,6 +28,10 @@ void Revista::setPublicacionMensual(bool publicacionMensual) {
 
 string Revista::getTipo() {
     return "Revista";
+}
+
+DTMaterial* Revista::toDT() {
+    return new DTRevista(getId(), getTitulo(), getAnioPublicacion(), numeroEdicion, publicacionMensual);
 }
 
 // Revista::~Revista() {}

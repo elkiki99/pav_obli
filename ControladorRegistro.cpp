@@ -56,6 +56,7 @@ DTLector* ControladorRegistro::ingresarLector(int id, string nombre, string pass
         return nullptr;
 
     this->dtLector = new DTLector(id, nombre, pass, fechaR);
+
     return this->dtLector;
 }
 
@@ -80,23 +81,25 @@ void ControladorRegistro::registrarFuncionario() {
     );
 
     mjus->agregarUsuario(usuario);
+
+    delete this->dtFuncionario;
+    this->dtFuncionario = nullptr;
 }
 
 void ControladorRegistro::registrarLector() {
     ManejadorUsuarios* mjus = ManejadorUsuarios::getInstancia();
 
-    // Convert DTFecha to int representation for Lector
-    DTFecha fecha = this->dtLector->getFechaRegistro();
-    int fechaInt = fecha.getAnio() * 10000 + fecha.getMes() * 100 + fecha.getDia();
-
     Usuario* usuario = new Lector(
         this->dtLector->getId(),
         this->dtLector->getNombre(),
         this->dtLector->getPass(),
-        fechaInt
+        this->dtLector->getFechaRegistro()  // DTFecha directamente
     );
 
     mjus->agregarUsuario(usuario);
+    
+    delete this->dtLector;
+    this->dtLector = nullptr;
 }
 
 void ControladorRegistro::cancelarRegistro() {

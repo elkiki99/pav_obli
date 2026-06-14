@@ -5,6 +5,8 @@
 
 using namespace std;
 
+class DTMaterial;
+
 class Material {
     protected:
         int id;
@@ -25,6 +27,8 @@ class Material {
         void setAnioPublicacion(int anioPublicacion);
 
         virtual string getTipo() = 0;
+        virtual DTMaterial* toDT() = 0;
+
         virtual ~Material();
     };
 

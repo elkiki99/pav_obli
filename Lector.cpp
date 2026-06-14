@@ -1,21 +1,18 @@
 #include "Lector.h"
+#include "DTLector.h"
 
-Lector:: Lector() {}
+Lector::Lector(int id, string nombre, string pass, DTFecha fechaRegistro) 
+    : Usuario(id, nombre, pass), fechaRegistro(fechaRegistro) {}
 
-Lector::Lector(int id, string nombre, string pass, int fechaRegistro) : Usuario(id, nombre, pass)
-{
-    this->fechaRegistro = fechaRegistro;
-}
-
-int Lector::getFechaRegistro() {
+DTFecha Lector::getFechaRegistro() {
     return fechaRegistro;
 }
 
-void Lector::setFechaRegistro(int fechaRegistro) {
+void Lector::setFechaRegistro(DTFecha fechaRegistro) {
     this->fechaRegistro = fechaRegistro;
 }
 
-const set<Prestamo*>& Lector::getPrestamos() {
+set<Prestamo*>& Lector::getPrestamos() {
     return prestamos;
 }
 
@@ -25,6 +22,10 @@ void Lector::agregarPrestamo(Prestamo* prestamo) {
 
 string Lector::getTipo() {
     return "Lector";
+}
+
+DTLector* Lector::toDT() {
+    return new DTLector(getId(), getNombre(), getPass(), fechaRegistro);
 }
 
 Lector::~Lector() {

@@ -20,6 +20,7 @@ class IControladorRegistro {
 
         virtual DTLector* ingresarLector(int id, string nombre, string pass, DTFecha fechaR) = 0;
         virtual void registrarLector() = 0;
+        
         virtual DTFuncionario* ingresarFuncionario(int id, string nombre, string pass, int numEmpleado) = 0;
         virtual void registrarFuncionario() = 0;
 

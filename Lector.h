@@ -4,24 +4,28 @@
 #include <set>
 #include "Usuario.h"
 #include "Prestamo.h"
+#include "DTFecha.h"
 
 class Lector : public Usuario {
     private:
-        int fechaRegistro;
+        // int fechaRegistro;
+        DTFecha fechaRegistro;
 
         set<Prestamo*> prestamos;
 
     public:
         Lector();
-        Lector(int id, string nombre, string pass, int fechaRegistro);
+        Lector(int id, string nombre, string pass, DTFecha fechaRegistro);
 
-        int getFechaRegistro();
-        void setFechaRegistro(int fechaRegistro);
+        DTFecha getFechaRegistro();
+        void setFechaRegistro(DTFecha fechaRegistro);
         
-        const set<Prestamo*>& getPrestamos();
+        set<Prestamo*>& getPrestamos();
         void agregarPrestamo(Prestamo* prestamo);
 
+        DTLector* toDT() override;
         string getTipo() override;
+        
         ~Lector();
 };
 

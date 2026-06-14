@@ -19,4 +19,8 @@ string Funcionario::getTipo() {
     return "Funcionario";
 }
 
+// DTUsuario* Funcionario::toDT() {
+//     return new DTFuncionario(getId(), getNombre(), getPass(), getNumEmpleado());
+// }
+
 // Funcionario::~Funcionario() {}

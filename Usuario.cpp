@@ -32,4 +32,11 @@ void Usuario::setPass(string pass) {
     this->pass = pass;
 }
 
+set<Prestamo*>& Usuario::getPrestamos() { 
+    static set<Prestamo*> vacio; 
+    return vacio; 
+}
+
+void Usuario::agregarPrestamo(Prestamo* /*prestamo*/) {}
+
 Usuario::~Usuario() {}

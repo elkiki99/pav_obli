@@ -2,8 +2,12 @@
 #define USUARIO_H
 
 #include <string>
+#include <set>
 
 using namespace std;
+
+class DTLector;
+class Prestamo;
 
 class Usuario {
     protected:
@@ -25,6 +29,10 @@ class Usuario {
         void setPass(string pass);
         
         virtual string getTipo() = 0;
+        virtual DTLector* toDT() = 0;
+        virtual set<Prestamo*>& getPrestamos();
+        virtual void agregarPrestamo(Prestamo* prestamo);
+        
         virtual ~Usuario();
 };
 

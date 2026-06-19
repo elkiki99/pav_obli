@@ -31,7 +31,6 @@ public:
     void cancelarRegistroPrestamo();
 
     set<DTPrestamo> mostrarPrestamosAsociados(int id);
-    
 };
 
 #endif

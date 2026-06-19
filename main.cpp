@@ -1,31 +1,31 @@
-#include <iostream>
-#include <limits>
-#include "FabricaRegistro.h"
-#include "IControladorRegistro.h"
-#include "FabricaMateriales.h"
 #include "IControladorMateriales.h"
+#include "IControladorRegistro.h"
+#include "ManejadorMaterial.h"
+#include "FabricaMateriales.h"
 #include "FabricaPrestamos.h"
-#include "DTFecha.h"
-#include "DTLector.h"
+#include "FabricaRegistro.h"
 #include "DTFuncionario.h"
 #include "DTPrestamo.h"
-#include "Sesion.h"
-#include "ManejadorMaterial.h"
-#include "Libro.h"
+#include "DTRevista.h"
+#include "DTLector.h"
+#include "DTFecha.h"
 #include "Revista.h"
 #include "DTLibro.h"
-#include "DTRevista.h"
+#include <iostream>
+#include "Sesion.h"
+#include "Libro.h"
+#include <limits>
+
+void consultarPrestamoLector();
+void verInformacionMaterial();
+void registrarFuncionario();
+void registrarMaterial();
+void registrarPrestamo();
+void registrarLector();
+void iniciarSesion();
+void cerrarSesion();
 
 using namespace std;
-
-void iniciarSesion();
-void registrarFuncionario();
-void registrarLector();
-void registrarMaterial();
-void verInformacionMaterial();
-void registrarPrestamo();
-void consultarPrestamoLector();
-void cerrarSesion();
 
 string leerLinea(const string& prompt);
 int leerInt(const string& prompt);
@@ -42,12 +42,19 @@ int main() {
             cout << "1. Iniciar Sesión" << endl;
         }
 
-        cout << "2. Registrar Funcionario" << endl;
-        cout << "3. Registrar Lector" << endl;
+        bool authYFunc = usuarioLogueado != nullptr && usuarioLogueado->getTipo() == "Funcionario";
 
-        if (usuarioLogueado != nullptr && usuarioLogueado->getTipo() == "Funcionario") {
+        if (authYFunc) {
+            cout << "2. Registrar Funcionario" << endl;
+            cout << "3. Registrar Lector" << endl;
             cout << "4. Registrar Material" << endl;
+        }
+
+        if (usuarioLogueado != nullptr) {
             cout << "5. Ver Información Material" << endl;
+        }
+
+        if (authYFunc) {
             cout << "6. Registrar Préstamo" << endl;
             cout << "7. Consultar Préstamos de Lector" << endl;
         }
@@ -57,12 +64,31 @@ int main() {
         }
 
         cout << "9. Salir" << endl;
+        
         opcion = leerInt("Opción: ");
 
         switch(opcion) {
-            case 1: iniciarSesion(); break;
-            case 2: registrarFuncionario(); break;
-            case 3: registrarLector(); break;
+            case 1: {
+                    if (Sesion::getInstancia()->getUsuarioLogueado() == nullptr)
+                        iniciarSesion(); 
+                    else
+                        cout << "\nOpción inválida. Por favor, seleccione una opción válida." << endl;
+                    break;
+            }
+            case 2: {
+                if (usuarioLogueado != nullptr && usuarioLogueado->getTipo() == "Funcionario")
+                    registrarFuncionario();
+                else
+                    cout << "\nOpción inválida. Por favor, seleccione una opción válida." << endl;
+                break;
+            }
+            case 3: {
+                if (usuarioLogueado != nullptr && usuarioLogueado->getTipo() == "Funcionario")
+                    registrarLector();
+                else
+                    cout << "\nOpción inválida. Por favor, seleccione una opción válida." << endl;
+                break;
+            }  
             case 4: {
                 if (usuarioLogueado != nullptr && usuarioLogueado->getTipo() == "Funcionario")
                     registrarMaterial();
@@ -71,7 +97,7 @@ int main() {
                 break;
             }
             case 5: {
-                if (usuarioLogueado != nullptr && usuarioLogueado->getTipo() == "Funcionario")
+                if (usuarioLogueado != nullptr)
                     verInformacionMaterial();
                 else
                     cout << "\nOpción inválida. Por favor, seleccione una opción válida." << endl;
@@ -91,16 +117,25 @@ int main() {
                     cout << "\nOpción inválida. Por favor, seleccione una opción válida." << endl;
                 break;
             }
-            case 8: cerrarSesion(); break;
-            case 9: cout << "\nSaliendo del sistema..." << endl; break;
-            default: cout << "\nOpción inválida. Por favor, seleccione una opción válida." << endl; break;
+            case 8: if (Sesion::getInstancia()->getUsuarioLogueado() != nullptr)
+                        cerrarSesion(); 
+                    else
+                        cout << "\nOpción inválida. Por favor, seleccione una opción válida." << endl;
+                    break;
+            case 9: cout << "\nSaliendo del sistema..." << endl; 
+                    break;
+            case 1738:
+                    registrarFuncionario();
+                    break;
+            default: 
+                    cout << "\nOpción inválida. Por favor, seleccione una opción válida." << endl; 
+                    break;
         }
     } while(opcion != 9);
 }
 
 void iniciarSesion() {
     if (Sesion::getInstancia()->getUsuarioLogueado() != nullptr) {
-        cout << "\nYa hay una sesión activa. Por favor, cierre la sesión actual antes de iniciar una nueva." << endl;
         return;
     }
 
@@ -164,6 +199,7 @@ void registrarFuncionario() {
     cout << "Número de Empleado: " << dtFuncionario->getNumEmpleado() << endl;
 
     int opcionConfirmar = -1;
+
     cout << "\n1. Confirmar Registro" << endl;
     cout << "2. Cancelar Registro" << endl;
     opcionConfirmar = leerInt("Opción: ");
@@ -236,19 +272,21 @@ void registrarMaterial() {
     int cantidadPaginas = 0;
     int numeroEdicion = 0;
     bool publicacionMensual = false;
-
+ 
     id = leerInt("\nIngrese Código de material: ");
     titulo = leerLinea("Ingrese Título: ");
     anioPublicacion = leerInt("Ingrese Año de Publicación: ");
     tipo = leerLinea("Ingrese Tipo (Libro/Revista): ");
 
-    while (tipo != "Libro" && tipo != "libro" && tipo != "Revista" && tipo != "revista") {
+    while (tipo != "Libro" && tipo != "libro" && tipo != "LIBRO" && 
+           tipo != "Revista" && tipo != "revista" && tipo != "REVISTA") 
+    {
         tipo = leerLinea("\nTipo inválido. Por favor, ingrese 'Libro' o 'Revista': ");
     }
 
-    if (tipo == "libro") {
+    if (tipo == "libro" || tipo == "LIBRO") {
         tipo = "Libro";
-    } else if (tipo == "revista") {
+    } else if (tipo == "revista" || tipo == "REVISTA") {
         tipo = "Revista";
     }
 
@@ -259,13 +297,15 @@ void registrarMaterial() {
         numeroEdicion = leerInt("Ingrese Número de Edición: ");
         esMensual = leerLinea("Es publicación mensual? (Si/No): ");
 
-        while(esMensual != "Si" && esMensual != "si" && esMensual != "No" && esMensual != "no") {
+        while(esMensual != "Si" && esMensual != "si" && esMensual != "SI" && 
+              esMensual != "No" && esMensual != "no" && esMensual != "NO")
+        {
             esMensual = leerLinea("\nOpción inválida. Por favor, ingrese 'Si' o 'No': ");
         }
 
-        if(esMensual == "Si" || esMensual == "si") {
+        if(esMensual == "Si" || esMensual == "si" || esMensual == "SI") {
             publicacionMensual = true;
-        } else if (esMensual == "No" || esMensual == "no") {
+        } else if (esMensual == "No" || esMensual == "no" || esMensual == "NO") {
             publicacionMensual = false;
         }
     }
@@ -329,6 +369,7 @@ void verInformacionMaterial() {
     }
 
     cout << "\n=== Materiales Disponibles ===" << endl;
+
     for (DTMaterial* dt : materiales) {
         cout << "  [" << dt->getId() << "] " << dt->getTitulo() << " (" << dt->getTipo() << ") " << endl;
         delete dt;
@@ -373,9 +414,9 @@ void registrarPrestamo() {
     int idLector = leerInt("\nIngrese ID del lector: ");
 
     DTLector* dtLector = ctrlPres->ingresarIdLector(idLector);
+    
     if (dtLector == nullptr) {
         cout << "\nLector no encontrado." << endl;
-        delete ctrlPres;
         return;
     }
 
@@ -385,7 +426,6 @@ void registrarPrestamo() {
     if (dtMaterial == nullptr) {
         cout << "\nMaterial no encontrado." << endl;
         ctrlPres->cancelarRegistroPrestamo();
-        delete ctrlPres;
         return;
     }
 
@@ -427,11 +467,11 @@ void consultarPrestamoLector() {
 
     if (prestamos.empty()) {
         cout << "\nNo se encontraron préstamos para ese lector." << endl;
-        delete ctrlPres;
         return;
     }
 
     cout << "\n=== Préstamos del Lector ===" << endl;
+
     for (const DTPrestamo& dtPrestamo : prestamos) {
         DTFecha fecha = dtPrestamo.getFechaPrestamo();
         cout << "\nCódigo de material: " << dtPrestamo.getCodigoMaterial() << endl;
@@ -439,13 +479,10 @@ void consultarPrestamoLector() {
         cout << "Fecha de préstamo: " << fecha.getDia() << "/" << fecha.getMes() << "/" << fecha.getAnio() << endl;
         cout << "Días de préstamo: " << dtPrestamo.getCantDias() << endl;
     }
-
-    delete ctrlPres;
 }
 
 void cerrarSesion() {
     if (Sesion::getInstancia()->getUsuarioLogueado() == nullptr) {
-        cout << "\nNo hay una sesión activa para cerrar." << endl;
         return;
     }
     IControladorRegistro* ctrlReg = FabricaRegistro::getInstancia()->getIControladorRegistro();
